@@ -1,0 +1,181 @@
+import * as crypto from 'crypto'
+import { v4 as uuidv4 } from 'uuid'
+import { DeviceLogService } from './deviceLogService.js'
+
+// 模拟数据库
+const quizzes: Map<string, any> = new Map()
+const quizContents: Map<string, any> = new Map()
+const userQuizRecords: Map<string, any> = new Map() // key: deviceId-quizId
+
+export class QuizService {
+  private logService = new DeviceLogService()
+  private secretKey = process.env.QUIZ_SECRET || 'jianwei-secret-key'
+  
+  constructor() {
+    // 初始化示例数据
+    this.initSampleData()
+  }
+  
+  private initSampleData() {
+    // 示例测评
+    const sampleQuizzes = [
+      {
+        id: 'quiz-001',
+        title: '心理健康自评量表',
+        description: '通过专业量表评估您的心理健康状态',
+        coverUrl: '',
+        priceRef: 1,
+        status: 1,
+        sortOrder: 1,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'quiz-002',
+        title: '性格色彩测试',
+        description: '发现您的性格优势与人际交往风格',
+        coverUrl: '',
+        priceRef: 1,
+        status: 1,
+        sortOrder: 2,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'quiz-003',
+        title: '情绪管理能力测评',
+        description: '评估您的情绪识别与调节能力',
+        coverUrl: '',
+        priceRef: 1,
+        status: 1,
+        sortOrder: 3,
+        createdAt: new Date().toISOString(),
+      },
+    ]
+    
+    sampleQuizzes.forEach(q => {
+      quizzes.set(q.id, q)
+      quizContents.set(q.id, {
+        quizId: q.id,
+        content: {
+          title: q.title,
+          coverImage: q.coverUrl,
+          intro: q.description,
+          questions: [
+            {
+              id: 'q1',
+              type: 'choice',
+              question: '最近一周，您感到心情愉悦的频率？',
+              options: [
+                { id: 'a', text: '几乎没有' },
+                { id: 'b', text: '偶尔' },
+                { id: 'c', text: '经常' },
+                { id: 'd', text: '每天都是' },
+              ],
+            },
+          ],
+        },
+        version: 1,
+        updatedAt: new Date().toISOString(),
+      })
+    })
+  }
+  
+  async getList() {
+    return Array.from(quizzes.values())
+      .filter(q => q.status === 1)
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+  }
+  
+  async unlock(quizId: string, deviceId: string) {
+    const quiz = quizzes.get(quizId)
+    if (!quiz) {
+      const error = new Error('测评不存在')
+      ;(error as any).status = 404
+      throw error
+    }
+    
+    // 检查是否已解锁
+    const recordKey = `${deviceId}-${quizId}`
+    if (userQuizRecords.has(recordKey)) {
+      return { unlocked: true, quizId }
+    }
+    
+    // 获取用户点数
+    // 实际应从数据库查询，这里简化
+    const userPoints = 10 // 模拟
+    
+    if (userPoints < quiz.priceRef) {
+      const error = new Error('点数不足')
+      ;(error as any).status = 400
+      throw error
+    }
+    
+    // 创建解锁记录
+    userQuizRecords.set(recordKey, {
+      id: uuidv4(),
+      deviceId,
+      quizId,
+      unlockedAt: new Date().toISOString(),
+      completedAt: null,
+    })
+    
+    // 记录日志
+    await this.logService.log(deviceId, '', 'unlock', { quizId })
+    
+    return { unlocked: true, quizId }
+  }
+  
+  async getContent(quizId: string, token: string) {
+    // 验证 Token
+    const quiz = quizzes.get(quizId)
+    if (!quiz) {
+      const error = new Error('测评不存在')
+      ;(error as any).status = 404
+      throw error
+    }
+    
+    // 生成临时访问 Token
+    const expectedToken = this.generateQuizToken(quizId)
+    if (token !== expectedToken) {
+      const error = new Error('Token 无效或已过期')
+      ;(error as any).status = 401
+      throw error
+    }
+    
+    return quizContents.get(quizId)
+  }
+  
+  async complete(quizId: string, deviceId: string) {
+    const recordKey = `${deviceId}-${quizId}`
+    const record = userQuizRecords.get(recordKey)
+    
+    if (!record) {
+      const error = new Error('未解锁该测评')
+      ;(error as any).status = 400
+      throw error
+    }
+    
+    record.completedAt = new Date().toISOString()
+    userQuizRecords.set(recordKey, record)
+    
+    // 记录日志
+    await this.logService.log(deviceId, '', 'complete', { quizId })
+    
+    return { completed: true }
+  }
+  
+  async logExport(quizId: string, deviceId: string) {
+    await this.logService.log(deviceId, '', 'export', { quizId })
+    return { logged: true }
+  }
+  
+  // 生成测评访问 Token
+  generateQuizToken(quizId: string): string {
+    const timestamp = Date.now()
+    const data = `${quizId}:${timestamp}`
+    const signature = crypto
+      .createHmac('sha256', this.secretKey)
+      .update(data)
+      .digest('hex')
+    return `${timestamp}.${signature}`
+  }
+}
