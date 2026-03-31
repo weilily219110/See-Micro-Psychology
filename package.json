@@ -9,6 +9,8 @@
   "scripts": {
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run dev --workspace=apps/api",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "dev": "npm run dev:web",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces"
   },
