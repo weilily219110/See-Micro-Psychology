@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { activateCode, getUserStatus } from '@/lib/api'
+import { activateCode, getUserStatus, getDeviceId } from '@/lib/api'
 import { useRouter } from 'next/navigation'
 
 export default function HomePage() {
@@ -82,23 +82,3 @@ export default function HomePage() {
   )
 }
 
-// 获取设备指纹
-async function getDeviceId(): Promise<string> {
-  const nav = navigator as any
-  if (!nav.plugins) nav.plugins = []
-  if (!nav.mimeTypes) nav.mimeTypes = []
-  
-  const components = [
-    navigator.userAgent,
-    navigator.language,
-    screen.width + 'x' + screen.height,
-    new Date().getTimezoneOffset(),
-  ].join('|')
-  
-  // 简单的设备指纹生成（生产环境建议使用更专业的方案）
-  const encoder = new TextEncoder()
-  const data = encoder.encode(components)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}

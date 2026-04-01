@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getQuizList, getUserStatus } from '@/lib/api'
+import { getQuizList, getUserStatus, unlockQuiz } from '@/lib/api'
 
 interface Quiz {
   id: string
@@ -26,6 +26,7 @@ export default function PlazaPage() {
   const [loading, setLoading] = useState(true)
   const [unlockingId, setUnlockingId] = useState<string | null>(null)
   const [confirmUnlock, setConfirmUnlock] = useState<Quiz | null>(null)
+  const [unlockedIds, setUnlockedIds] = useState<string[]>([])
 
   useEffect(() => {
     loadData()
@@ -51,18 +52,12 @@ export default function PlazaPage() {
     
     setUnlockingId(quiz.id)
     try {
-      // 调用解锁API
-      const response = await fetch('/api/quiz/unlock', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quizId: quiz.id }),
-      })
-      
-      if (response.ok) {
-        // 刷新数据
-        await loadData()
-        setConfirmUnlock(null)
-      }
+      await unlockQuiz(quiz.id)
+      // 解锁成功后，更新本地已解锁列表
+      setUnlockedIds(prev => [...prev, quiz.id])
+      // 刷新用户状态（获取最新点数）
+      await loadData()
+      setConfirmUnlock(null)
     } catch (error) {
       console.error('解锁失败:', error)
     } finally {
@@ -78,7 +73,6 @@ export default function PlazaPage() {
     )
   }
 
-  const unlockedIds: string[] = [] // 从API获取已解锁列表
   const isSvip = userStatus?.isSvip || false
 
   return (

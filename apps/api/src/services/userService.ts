@@ -1,5 +1,4 @@
-// 模拟数据库
-const users: Map<string, any> = new Map()
+import { users } from './codeService.js'
 
 export class UserService {
   async getStatus(deviceId: string) {

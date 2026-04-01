@@ -82,7 +82,8 @@ export async function getDeviceId(): Promise<string> {
     navigator.userAgent,
     navigator.language,
     screen.width + 'x' + screen.height,
-    new Date().getTimezoneOffset(),
+    screen.colorDepth,
+    navigator.hardwareConcurrency || 'unknown',
   ].join('|')
   
   const encoder = new TextEncoder()

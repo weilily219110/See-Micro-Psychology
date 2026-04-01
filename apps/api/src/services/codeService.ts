@@ -3,7 +3,9 @@ import { DeviceLogService } from './deviceLogService.js'
 
 // 模拟数据库 - 生产环境替换为 PostgreSQL
 const codes: Map<string, any> = new Map()
-const users: Map<string, any> = new Map()
+
+// 统一用户存储（导出供 UserService 使用）
+export const users: Map<string, any> = new Map()
 
 export class CodeService {
   private logService = new DeviceLogService()
