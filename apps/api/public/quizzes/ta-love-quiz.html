@@ -5,190 +5,1764 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TA喜不喜欢我 | 情感投入度专业测评</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #FFF9FB 0%, #FFFFFF 50%, #F0F9FF 100%); min-height: 100vh; color: #2D3748; }
-        .page { display: none; min-height: 100vh; padding: 24px 20px; }
-        .page.active { display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 420px; width: 100%; text-align: center; margin-top: 8vh; }
-        .brand { width: 100px; height: 100px; margin: 0 auto 24px; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 16px 32px rgba(255,107,157,0.3); }
-        h1 { font-size: 36px; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { font-size: 16px; color: #718096; line-height: 1.8; margin-bottom: 32px; }
-        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
-        .feature { background: white; border-radius: 12px; padding: 16px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .feature-icon { font-size: 24px; margin-bottom: 8px; }
-        .feature-text { font-size: 12px; color: #718096; font-weight: 600; }
-        .btn { background: linear-gradient(135deg, #FF6B9D, #FF8F5D); color: white; border: none; padding: 18px 48px; font-size: 16px; border-radius: 30px; cursor: pointer; font-weight: 700; box-shadow: 0 8px 24px rgba(255,107,157,0.3); }
-        .btn:hover { transform: translateY(-2px); }
-        .quiz-card { width: 100%; max-width: 420px; background: white; border-radius: 20px; padding: 28px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-top: 16px; text-align: left; }
-        .progress { height: 6px; background: #F0F0F0; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #FF6B9D, #FF8F5D); transition: width 0.3s; width: 0%; }
-        .counter { font-size: 14px; color: #FF6B9D; font-weight: 700; margin-bottom: 12px; }
-        .question { font-size: 18px; font-weight: 700; margin-bottom: 24px; line-height: 1.5; }
-        .options { display: flex; flex-direction: column; gap: 10px; }
-        .option { background: #FFF9FB; border: 2px solid transparent; padding: 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: #718096; text-align: left; }
-        .option:hover { background: white; border-color: #FFB8D0; transform: translateX(4px); }
-        .option.selected { background: rgba(255,107,157,0.1); border-color: #FF6B9D; color: #FF6B9D; font-weight: 600; }
-        .result { width: 100%; max-width: 460px; text-align: center; }
-        .result-card { background: white; border-radius: 24px; padding: 32px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-bottom: 20px; }
-        .type-icon { font-size: 60px; margin-bottom: 16px; }
-        .type-name { font-size: 24px; font-weight: 800; color: #2D3748; margin-bottom: 8px; }
-        .type-sub { font-size: 14px; color: #718096; margin-bottom: 24px; }
-        .score-circle { width: 140px; height: 140px; margin: 0 auto 24px; position: relative; }
-        .score-svg { transform: rotate(-90deg); }
-        .score-bg { fill: none; stroke: #FFF0F3; stroke-width: 10; }
-        .score-fill { fill: none; stroke: url(#grad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 0 377; transition: stroke-dasharray 1.5s ease; }
-        .score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .score-val { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .score-label { font-size: 12px; color: #A0AEC0; font-weight: 600; }
-        .dims { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-bottom: 20px; text-align: left; }
-        .dims h3 { font-size: 16px; margin-bottom: 16px; text-align: center; }
-        .dim-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .dim-name { font-size: 14px; color: #718096; }
-        .dim-bar { flex: 1; height: 8px; background: #F0F0F0; border-radius: 4px; margin: 0 12px; overflow: hidden; }
-        .dim-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-        .dim-val { font-size: 14px; font-weight: 700; min-width: 40px; }
-        .footer { display: flex; gap: 12px; width: 100%; max-width: 460px; }
-        .btn-secondary { flex: 1; padding: 16px; border-radius: 14px; border: 2px solid #E0E0E0; background: #F7F7F7; font-size: 14px; font-weight: 700; cursor: pointer; }
-        .btn-main { flex: 1; padding: 16px; border-radius: 14px; border: none; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); color: white; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(255,107,157,0.3); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        :root {
+            /* 多巴胺配色系统 - 活力满满 */
+            --pink: #FF6B9D;
+            --pink-light: #FFB8D0;
+            --orange: #FF8F5D;
+            --yellow: #FFD93D;
+            --blue: #6BCBFF;
+            --purple: #C084FC;
+            --green: #4DEDB0;
+            --red: #FF5757;
+            
+            /* 主色调 */
+            --primary: #FF6B9D;
+            --primary-light: #FFB8D0;
+            --secondary: #6BCBFF;
+            --accent: #FFD93D;
+            --warning: #FF8F5D;
+            --success: #4DEDB0;
+            
+            /* 背景与文字 */
+            --bg-main: #FFFFFF;
+            --bg-soft: #FFF9FB;
+            --bg-card: rgba(255, 255, 255, 0.98);
+            --text-main: #2D3748;
+            --text-sub: #718096;
+            --text-light: #A0AEC0;
+            --shadow: 0 8px 32px rgba(255, 107, 157, 0.15);
+            --shadow-hover: 0 12px 40px rgba(255, 107, 157, 0.25);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #FFF9FB 0%, #FFFFFF 50%, #F0F9FF 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 多巴胺浮动装饰 */
+        .dopamine-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .float-shape {
+            position: absolute;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+            filter: blur(0.5px);
+        }
+
+        .shape-1 {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--pink), var(--orange));
+            border-radius: 50%;
+            top: 10%;
+            left: -20px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border-radius: 50%;
+            top: 20%;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+        .shape-3 {
+            width: 40px;
+            height: 40px;
+            background: var(--yellow);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            top: 60%;
+            left: 10%;
+            animation-delay: 2s;
+            opacity: 0.8;
+        }
+
+        .shape-4 {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            bottom: 20%;
+            right: 5%;
+            animation-delay: 3s;
+        }
+
+        .shape-5 {
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--pink-light);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            bottom: 10%;
+            left: -30px;
+            animation-delay: 4s;
+            opacity: 0.4;
+        }
+
+        .shape-6 {
+            width: 30px;
+            height: 30px;
+            background: var(--orange);
+            border-radius: 50%;
+            top: 40%;
+            right: 20%;
+            animation-delay: 1.5s;
+        }
+
+        .heart {
+            position: absolute;
+            color: var(--pink);
+            font-size: 24px;
+            opacity: 0.3;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .heart-1 { top: 15%; left: 20%; animation-delay: 0.5s; }
+        .heart-2 { top: 70%; right: 15%; animation-delay: 2.5s; font-size: 18px; }
+        .heart-3 { bottom: 30%; left: 25%; animation-delay: 3.5s; font-size: 20px; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(5deg); }
+            66% { transform: translateY(-10px) rotate(-5deg); }
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 24px 20px;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 引导页 - 多巴胺活力风格 */
+        .landing-container {
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            margin-top: 8vh;
+            padding: 0 16px;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255,107,157,0.1), rgba(107,203,255,0.1));
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--pink);
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,107,157,0.2);
+            letter-spacing: 1px;
+        }
+
+        .brand-mark {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--orange) 50%, var(--yellow) 100%);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 
+                0 20px 40px rgba(255,107,157,0.3),
+                0 0 0 8px rgba(255,255,255,0.5),
+                0 0 0 16px rgba(255,107,157,0.1);
+            position: relative;
+            overflow: hidden;
+            animation: pulse-heart 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-heart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .brand-mark::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .brand-title {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--pink), var(--orange), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 12px rgba(255,107,157,0.15);
+        }
+
+        .brand-subtitle {
+            font-size: 17px;
+            color: var(--text-sub);
+            line-height: 1.8;
+            margin-bottom: 40px;
+            font-weight: 400;
+            padding: 0 10px;
+        }
+
+        .highlight-text {
+            color: var(--pink);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(120deg, var(--yellow), var(--yellow));
+            opacity: 0.4;
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .feature-pill {
+            background: white;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            border-radius: 16px;
+            padding: 16px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .feature-pill::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            border-radius: 18px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .feature-pill:nth-child(2)::before {
+            background: linear-gradient(135deg, var(--orange), var(--yellow));
+        }
+
+        .feature-pill:nth-child(3)::before {
+            background: linear-gradient(135deg, var(--purple), var(--green));
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .feature-text {
+            font-size: 13px;
+            color: var(--text-sub);
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--orange) 100%);
+            color: white;
+            border: none;
+            padding: 20px 64px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 
+                0 10px 30px rgba(255,107,157,0.4),
+                0 0 0 4px rgba(255,107,157,0.1);
+            transition: all 0.3s;
+            font-weight: 700;
+            letter-spacing: 1px;
+            -webkit-appearance: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 15px 40px rgba(255,107,157,0.5),
+                0 0 0 6px rgba(255,107,157,0.15);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-primary::after {
+            content: '✨';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1.2); }
+        }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 32px;
+            font-size: 12px;
+            color: var(--text-light);
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 测试页样式优化 */
+        .quiz-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            border: 2px solid rgba(255,255,255,0.8);
+            position: relative;
+        }
+
+        .quiz-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(135deg, var(--pink), var(--blue), var(--yellow));
+            border-radius: 26px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .progress-wrap {
+            margin-bottom: 28px;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: #F0F0F0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow));
+            border-radius: 4px;
+            transition: width 0.4s ease;
+            width: 0%;
+            box-shadow: 0 0 10px rgba(255,107,157,0.3);
+        }
+
+        .dim-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .dim-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .dim-item.active {
+            color: var(--pink);
+            font-weight: 700;
+            background: rgba(255,107,157,0.1);
+        }
+
+        .dim-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.3;
+        }
+
+        .dim-item.active .dim-dot {
+            opacity: 1;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .question-count {
+            font-size: 14px;
+            color: var(--pink);
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 28px;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: #FFF9FB;
+            border: 2px solid transparent;
+            padding: 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            color: var(--text-sub);
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--pink), var(--orange));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .option:hover {
+            background: white;
+            border-color: var(--pink-light);
+            transform: translateX(6px);
+            box-shadow: 0 4px 12px rgba(255,107,157,0.15);
+        }
+
+        .option:hover::before {
+            opacity: 1;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, rgba(255,107,157,0.1), rgba(255,143,93,0.1));
+            border-color: var(--pink);
+            color: var(--pink);
+            font-weight: 600;
+        }
+
+        .option.selected::before {
+            opacity: 1;
+        }
+
+        .opt-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(255,107,157,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+            color: var(--pink);
+            transition: all 0.2s;
+        }
+
+        .option.selected .opt-num {
+            background: linear-gradient(135deg, var(--pink), var(--orange));
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* 结果页框架 */
+        .result-wrapper {
+            width: 100%;
+            max-width: 460px;
+            padding-bottom: 40px;
+        }
+
+        .result-hero {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 36px 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin-bottom: 24px;
+            border: 2px solid rgba(255,255,255,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow), var(--green), var(--blue), var(--purple));
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(255,107,157,0.1), rgba(107,203,255,0.1));
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--pink);
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,107,157,0.2);
+            box-shadow: 0 2px 8px rgba(255,107,157,0.1);
+        }
+
+        .type-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .type-subtitle {
+            font-size: 15px;
+            color: var(--text-sub);
+            margin-bottom: 28px;
+            font-weight: 500;
+        }
+
+        .score-ring-wrap {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 24px;
+            position: relative;
+            filter: drop-shadow(0 8px 24px rgba(255,107,157,0.2));
+        }
+
+        .score-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .score-track {
+            fill: none;
+            stroke: #FFF0F3;
+            stroke-width: 10;
+        }
+
+        .score-indic {
+            fill: none;
+            stroke: url(#scoreGrad);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dasharray 1.5s ease;
+            stroke-dasharray: 0 440;
+            filter: drop-shadow(0 0 6px rgba(255,107,157,0.4));
+        }
+
+        .score-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-val {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pink), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 6px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* 雷达图区域 - 优化版 */
+        .radar-section {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .sect-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sect-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radar-wrap {
+            position: relative;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #radarCanvas {
+            max-width: 100%;
+        }
+
+        .radar-legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px dashed #FFE4EC;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        .leg-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 关系阶段定位 */
+        .stage-section {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 28px 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: linear-gradient(90deg, #FFE4EC, #FFB8D0, #FF6B9D);
+            border-radius: 2px;
+            z-index: 0;
+        }
+
+        .t-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .t-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #FFE4EC;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(255,107,157,0.2);
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .t-dot.active {
+            background: var(--pink);
+            transform: scale(1.2);
+        }
+
+        .t-dot.current {
+            background: linear-gradient(135deg, var(--orange), var(--yellow));
+            box-shadow: 0 0 0 4px rgba(255,143,93,0.2);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(255,143,93,0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(255,143,93,0.1); }
+        }
+
+        .t-label {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .stage-info {
+            background: linear-gradient(135deg, #FFF9FB, #F0F9FF);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 8px;
+            border-left: 4px solid var(--pink);
+        }
+
+        .stage-name {
+            font-weight: 800;
+            color: var(--pink);
+            margin-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stage-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.7;
+        }
+
+        /* 健康诊断 - 卡片网格 */
+        .diagnosis-section {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .diag-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .status-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .status-pill.safe {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            color: #2E7D32;
+        }
+
+        .status-pill.warn {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            color: #EF6C00;
+        }
+
+        .status-pill.danger {
+            background: linear-gradient(135deg, #FBE9E7, #FFCCBC);
+            color: #D84315;
+        }
+
+        .diag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .diag-card {
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diag-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .diag-card.safe {
+            background: linear-gradient(135deg, #F1F8F5, #E8F5E9);
+            border-color: #A5D6A7;
+        }
+
+        .diag-card.safe::before { background: linear-gradient(90deg, #81C784, #4CAF50); }
+
+        .diag-card.warn {
+            background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+            border-color: #FFD54F;
+        }
+
+        .diag-card.warn::before { background: linear-gradient(90deg, #FFB74D, #FF9800); }
+
+        .diag-card.danger {
+            background: linear-gradient(135deg, #FBE9E7, #FFCDD2);
+            border-color: #E57373;
+        }
+
+        .diag-card.danger::before { background: linear-gradient(90deg, #E57373, #F44336); }
+
+        .diag-title {
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diag-card.safe .diag-title { color: #1B5E20; }
+        .diag-card.warn .diag-title { color: #E65100; }
+        .diag-card.danger .diag-title { color: #BF360C; }
+
+        .diag-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .action-steps {
+            background: rgba(255,255,255,0.8);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.8;
+            border-left: 3px solid var(--pink);
+        }
+
+        .step-label {
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pink), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 4px;
+        }
+
+        /* 行动锦囊 */
+        .strategy-section {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .strategy-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .str-card {
+            background: linear-gradient(135deg, #FFF9FB, #FFFFFF);
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #FFE4EC;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .str-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(255,107,157,0.15);
+            border-color: var(--pink-light);
+        }
+
+        .str-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--pink), var(--orange));
+        }
+
+        .str-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .str-body {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.7;
+            padding-left: 34px;
+        }
+
+        /* 底部操作 */
+        .action-footer {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+        }
+
+        .btn-secondary {
+            background: #F7F7F7;
+            color: var(--text-sub);
+            border: 2px solid #E0E0E0;
+        }
+
+        .btn-secondary:hover {
+            background: #EFEFEF;
+            transform: translateY(-2px);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, var(--pink) 0%, var(--orange) 100%);
+            color: white;
+            box-shadow: 0 8px 24px rgba(255,107,157,0.3);
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255,107,157,0.4);
+        }
+
+        @media (max-width: 380px) {
+            .brand-title { font-size: 36px; }
+            .brand-subtitle { font-size: 15px; }
+            .question-text { font-size: 18px; }
+            .option { padding: 16px; font-size: 14px; }
+            .features-grid { gap: 8px; }
+            .feature-pill { padding: 12px 4px; }
+        }
     </style>
 </head>
 <body>
-    <svg width="0" height="0"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#FF6B9D"/><stop offset="100%" style="stop-color:#FF8F5D"/></linearGradient></defs></svg>
-    
+
+    <svg width="0" height="0">
+        <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#FF8F5D;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#FFD93D;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="dopamine-bg">
+        <div class="float-shape shape-1"></div>
+        <div class="float-shape shape-2"></div>
+        <div class="float-shape shape-3"></div>
+        <div class="float-shape shape-4"></div>
+        <div class="float-shape shape-5"></div>
+        <div class="float-shape shape-6"></div>
+        <div class="heart heart-1">💕</div>
+        <div class="heart heart-2">💖</div>
+        <div class="heart heart-3">💗</div>
+    </div>
+
     <!-- 引导页 -->
-    <div class="page active" id="landing">
-        <div class="container">
-            <div class="brand">💖</div>
-            <h1>TA喜不喜欢我</h1>
-            <p class="subtitle">基于四维情感投入模型<br>20道场景题精准解析<br>生成可执行的恋爱战略报告</p>
-            <div class="features">
-                <div class="feature"><div class="feature-icon">🎯</div><div class="feature-text">4维雷达扫描</div></div>
-                <div class="feature"><div class="feature-icon">⚠️</div><div class="feature-text">短择风险预警</div></div>
-                <div class="feature"><div class="feature-icon">💡</div><div class="feature-text">专属行动锦囊</div></div>
-            </div>
-            <button class="btn" onclick="start()">开始测试</button>
-        </div>
-    </div>
-    
-    <!-- 测试页 -->
-    <div class="page" id="quiz">
-        <div class="quiz-card">
-            <div class="progress"><div class="progress-fill" id="progress"></div></div>
-            <div class="counter"><span id="current">1</span> / 20</div>
-            <div class="question" id="question">加载中...</div>
-            <div class="options" id="options"></div>
-        </div>
-    </div>
-    
-    <!-- 结果页 -->
-    <div class="page" id="result">
-        <div class="result">
-            <div class="result-card">
-                <div class="type-icon" id="typeIcon">🧊</div>
-                <div class="type-name" id="typeName">--</div>
-                <div class="type-sub" id="typeSub">分析中...</div>
-                <div class="score-circle">
-                    <svg class="score-svg" viewBox="0 0 140 140"><circle class="score-bg" cx="70" cy="70" r="60"/><circle class="score-fill" id="scoreCircle" cx="70" cy="70" r="60"/></svg>
-                    <div class="score-text"><div class="score-val" id="scoreVal">0%</div><div class="score-label">投入指数</div></div>
+    <div class="page active" id="landingPage">
+        <div class="landing-container">
+            <div class="brand-badge">💝 专业情感测评</div>
+            <div class="brand-mark">💖</div>
+            <h1 class="brand-title">TA喜不喜欢我</h1>
+            <p class="brand-subtitle">
+                基于<span class="highlight-text">四维情感投入模型</span><br>
+                20道场景题精准解析<br>
+                生成可执行的恋爱战略报告
+            </p>
+            <div class="features-grid">
+                <div class="feature-pill">
+                    <span class="feature-icon">🎯</span>
+                    <div class="feature-text">4维雷达<br>扫描</div>
+                </div>
+                <div class="feature-pill">
+                    <span class="feature-icon">⚠️</span>
+                    <div class="feature-text">短择风险<br>预警</div>
+                </div>
+                <div class="feature-pill">
+                    <span class="feature-icon">💡</span>
+                    <div class="feature-text">专属行动<br>锦囊</div>
                 </div>
             </div>
-            <div class="dims">
-                <h3>📊 四维能力分析</h3>
-                <div class="dim-row"><span class="dim-name">注意力</span><div class="dim-bar"><div class="dim-fill" id="d1" style="width:0%;background:#FF6B9D"></div></div><span class="dim-val" id="v1">0%</span></div>
-                <div class="dim-row"><span class="dim-name">行动力</span><div class="dim-bar"><div class="dim-fill" id="d2" style="width:0%;background:#6BCBFF"></div></div><span class="dim-val" id="v2">0%</span></div>
-                <div class="dim-row"><span class="dim-name">情绪感</span><div class="dim-bar"><div class="dim-fill" id="d3" style="width:0%;background:#FFD93D"></div></div><span class="dim-val" id="v3">0%</span></div>
-                <div class="dim-row"><span class="dim-name">未来度</span><div class="dim-bar"><div class="dim-fill" id="d4" style="width:0%;background:#4DEDB0"></div></div><span class="dim-val" id="v4">0%</span></div>
-            </div>
-            <div class="footer">
-                <button class="btn-secondary" onclick="reset()">重新测试</button>
-                <button class="btn-main" onclick="share()">生成分享</button>
+            <button class="btn-primary" id="startBtn">开始测试</button>
+            <div class="trust-badges">
+                <span class="trust-item">✓ 已帮助10W+人</span>
+                <span class="trust-item">✓ 科学依恋理论</span>
+                <span class="trust-item">✓ 3分钟出结果</span>
             </div>
         </div>
     </div>
-    
-    <script>
-const questions=[
-{q:"TA通常回复你消息的速度？",dim:0,opts:[{t:"经常已读不回",s:1},{t:"看到会回但不秒回",s:2},{t:"基本秒回+解释",s:3},{t:"秒回成瘾",s:4}]},
-{q:"当你遇到困难，TA的反应？",dim:2,opts:[{t:"简单安慰转移话题",s:1},{t:"给建议不深问",s:2},{t:"耐心倾听询问",s:3},{t:"帮解决+陪伴",s:4}]},
-{q:"TA记得你随口提的小事？",dim:0,opts:[{t:"完全记不住",s:1},{t:"经常记混",s:2},{t:"能记住大部分",s:3},{t:"记得清+给惊喜",s:4}]},
-{q:"群体聚会中TA对你的态度？",dim:0,opts:[{t:"和其他人一样",s:1},{t:"偶尔照顾你",s:2},{t:"明显更关注你",s:3},{t:"眼里只有你",s:4}]},
-{q:"你和其他异性走得近时？",dim:2,opts:[{t:"完全不在意",s:1},{t:"似乎有点不同",s:2},{t:"subtly询问",s:3},{t:"明显吃醋",s:4}]},
-{q:"TA主动找你的频率？",dim:1,opts:[{t:"几乎从不主动",s:1},{t:"偶尔主动",s:2},{t:"经常分享生活",s:3},{t:"每天必找你",s:4}]},
-{q:"关于未来规划TA是否考虑你？",dim:3,opts:[{t:"从不提及",s:1},{t:"偶尔模糊提到",s:2},{t:"咨询你意见",s:3},{t:"明确纳入未来",s:4}]},
-{q:"TA对你身体接触的频率？",dim:1,opts:[{t:"刻意保持距离",s:1},{t:"不排斥不主动",s:2},{t:"自然轻微接触",s:3},{t:"经常靠近",s:4}]},
-{q:"你生病时TA会？",dim:1,opts:[{t:"口头关心",s:1},{t:"叮嘱吃药",s:2},{t:"买药/外卖",s:3},{t:"陪在身边",s:4}]},
-{q:"TA愿为你改变习惯或计划？",dim:3,opts:[{t:"完全不愿意",s:1},{t:"小事可以",s:2},{t:"重要事愿调整",s:3},{t:"愿重大改变",s:4}]},
-{q:"社交媒体上TA对你的互动？",dim:0,opts:[{t:"从不点赞",s:1},{t:"偶尔点赞",s:2},{t:"经常+专属评论",s:3},{t:"秒赞+走心评论",s:4}]},
-{q:"TA向朋友/家人提起你？",dim:3,opts:[{t:"从未提起",s:1},{t:"偶尔像普通朋友",s:2},{t:"经常说好话",s:3},{t:"三句不离你",s:4}]},
-{q:"你提不太合理要求时TA反应？",dim:2,opts:[{t:"直接拒绝",s:1},{t:"看心情",s:2},{t:"无奈但满足",s:3},{t:"宠着觉得可爱",s:4}]},
-{q:"TA看你的眼神？",dim:0,opts:[{t:"避免眼神接触",s:1},{t:"正常对视",s:2},{t:"偷偷看你",s:3},{t:"专注温柔有光",s:4}]},
-{q:"金钱/时间上TA投入程度？",dim:1,opts:[{t:"很计较",s:1},{t:"基本AA",s:2},{t:"愿意付出",s:3},{t:"对你很大方",s:4}]},
-{q:"你出糗时TA反应？",dim:2,opts:[{t:"嘲笑嫌弃",s:1},{t:"无动于衷",s:2},{t:"安慰没关系",s:3},{t:"觉得可爱更喜欢",s:4}]},
-{q:"TA了解并参与你的兴趣爱好？",dim:3,opts:[{t:"完全不感兴趣",s:1},{t:"听不参与",s:2},{t:"愿意陪你做",s:3},{t:"主动学习找共同语言",s:4}]},
-{q:"深夜时分TA因你情绪波动？",dim:2,opts:[{t:"夜晚基本不联系",s:1},{t:"正常聊天",s:2},{t:"感性说心里话",s:3},{t:"格外黏人表思念",s:4}]},
-{q:"TA对你的保护欲？",dim:1,opts:[{t:"没有保护欲",s:1},{t:"大事上有",s:2},{t:"细节控如走内侧",s:3},{t:"全方位保护",s:4}]},
-{q:"你消失一天不联系TA会？",dim:3,opts:[{t:"没反应",s:1},{t:"奇怪但不问",s:2},{t:"主动问怎么了",s:3},{t:"焦急万分疯狂找",s:4}]}
-];
-let cur=0, scores=[0,0,0,0];
-const dimNames=["注意力","行动力","情绪感","未来度"];
 
-function start(){
-    document.getElementById("landing").classList.remove("active");
-    document.getElementById("quiz").classList.add("active");
-    show();
-}
-function show(){
-    const q=questions[cur];
-    document.getElementById("current").textContent=cur+1;
-    document.getElementById("progress").style.width=(cur/questions.length*100)+"%";
-    document.getElementById("question").textContent=q.q;
-    const container=document.getElementById("options");
-    container.innerHTML="";
-    q.opts.forEach((o,i)=>{
-        const div=document.createElement("div");
-        div.className="option"; div.textContent=o.t;
-        div.onclick=()=>select(i);
-        container.appendChild(div);
-    });
-}
-function select(i){
-    scores[questions[cur].dim]+=questions[cur].opts[i].s;
-    document.querySelectorAll(".option")[i].classList.add("selected");
-    setTimeout(()=>{
-        cur++;
-        if(cur<questions.length) show();
-        else showResult();
-    },200);
-}
-function showResult(){
-    document.getElementById("quiz").classList.remove("active");
-    document.getElementById("result").classList.add("active");
-    const dims=scores.map(s=>Math.round(s/20*100));
-    const total=Math.round(dims.reduce((a,b)=>a+b,0)/4);
-    const types=[
-        {min:0,max:25,name:"疏离观察者",sub:"理性防御型",icon:"🧊"},
-        {min:26,max:40,name:"浅层探索者",sub:"兴趣试探型",icon:"👁️"},
-        {min:41,max:55,name:"渐进投入者",sub:"稳步升温型",icon:"🌱"},
-        {min:56,max:70,name:"主动连接者",sub:"明显好感型",icon:"🎯"},
-        {min:71,max:85,name:"深度绑定者",sub:"长期认定型",icon:"💎"},
-        {min:86,max:100,name:"融合共生者",sub:"极致痴迷型",icon:"🔥"}
-    ];
-    const type=types.find(t=>total>=t.min&&total<=t.max);
-    document.getElementById("typeIcon").textContent=type.icon;
-    document.getElementById("typeName").textContent=type.name;
-    document.getElementById("typeSub").textContent=type.sub;
-    dims.forEach((d,i)=>{
-        document.getElementById("d"+(i+1)).style.width=d+"%";
-        document.getElementById("v"+(i+1)).textContent=d+"%";
-    });
-    const circle=document.getElementById("scoreCircle");
-    const r=60, c=2*Math.PI*r;
-    circle.style.strokeDasharray="0 "+c;
-    setTimeout(()=>{circle.style.strokeDasharray=(total/100*c)+" "+c;},100);
-    document.getElementById("scoreVal").textContent=total+"%";
-}
-function reset(){cur=0;scores=[0,0,0,0];document.getElementById("result").classList.remove("active");document.getElementById("landing").classList.add("active");}
-function share(){alert("分享功能开发中...");}
+    <!-- 测试页 -->
+    <div class="page" id="quizPage">
+        <div class="quiz-card">
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="dim-indicators">
+                    <span class="dim-item" id="d1"><span class="dim-dot"></span>注意力</span>
+                    <span class="dim-item" id="d2"><span class="dim-dot"></span>行动力</span>
+                    <span class="dim-item" id="d3"><span class="dim-dot"></span>情绪感</span>
+                    <span class="dim-item" id="d4"><span class="dim-dot"></span>未来度</span>
+                </div>
+            </div>
+            <div class="question-count">
+                <span id="currentNum">1</span> / <span id="totalNum">20</span>
+            </div>
+            <div class="question-text" id="questionText">加载中...</div>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+    </div>
+
+    <!-- 结果页 -->
+    <div class="page" id="resultPage">
+        <div class="result-wrapper">
+            
+            <!-- 核心结果 -->
+            <div class="result-hero">
+                <div class="type-badge">
+                    <span id="typeIcon">🧊</span>
+                    <span id="typeTag">分析中</span>
+                </div>
+                <div class="type-title" id="typeTitle">--</div>
+                <div class="type-subtitle" id="typeSubtitle">计算你的情感投入模型</div>
+                
+                <div class="score-ring-wrap">
+                    <svg class="score-svg" viewBox="0 0 140 140">
+                        <circle class="score-track" cx="70" cy="70" r="64"/>
+                        <circle class="score-indic" id="scoreCircle" cx="70" cy="70" r="64"/>
+                    </svg>
+                    <div class="score-content">
+                        <div class="score-val" id="scoreVal">0%</div>
+                        <div class="score-label">投入指数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 雷达图 - 优化版 -->
+            <div class="radar-section">
+                <div class="sect-header">
+                    <div class="sect-title">📊 四维能力雷达</div>
+                </div>
+                <div class="radar-wrap">
+                    <canvas id="radarCanvas" width="280" height="260"></canvas>
+                </div>
+                <div class="radar-legend">
+                    <div class="legend-item">
+                        <div class="leg-color" style="background:#FF6B9D"></div>
+                        <span><strong>注意力</strong> - 细节关注度</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="leg-color" style="background:#6BCBFF"></div>
+                        <span><strong>行动力</strong> - 时间/金钱投入</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="leg-color" style="background:#FFD93D"></div>
+                        <span><strong>情绪感</strong> - 敏感/吃醋程度</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="leg-color" style="background:#4DEDB0"></div>
+                        <span><strong>未来度</strong> - 长期规划意愿</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关系阶段定位 -->
+            <div class="stage-section">
+                <div class="sect-title">🧭 关系阶段定位</div>
+                <div class="timeline">
+                    <div class="t-point">
+                        <div class="t-dot" id="p1"></div>
+                        <div class="t-label">初识</div>
+                    </div>
+                    <div class="t-point">
+                        <div class="t-dot" id="p2"></div>
+                        <div class="t-label">试探</div>
+                    </div>
+                    <div class="t-point">
+                        <div class="t-dot" id="p3"></div>
+                        <div class="t-label">暧昧</div>
+                    </div>
+                    <div class="t-point">
+                        <div class="t-dot" id="p4"></div>
+                        <div class="t-label">确认</div>
+                    </div>
+                    <div class="t-point">
+                        <div class="t-dot" id="p5"></div>
+                        <div class="t-label">稳定</div>
+                    </div>
+                </div>
+                <div class="stage-info">
+                    <div class="stage-name" id="stageName">阶段分析中...</div>
+                    <div class="stage-desc" id="stageDesc">正在评估当前关系所处位置及3个月发展预测...</div>
+                </div>
+            </div>
+
+            <!-- 健康诊断 - 具体可执行 -->
+            <div class="diagnosis-section">
+                <div class="diag-header">
+                    <div class="sect-title">⚠️ 关系健康诊断</div>
+                    <div class="status-pill safe" id="healthStatus">安全区</div>
+                </div>
+                <div class="diag-list" id="diagList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 行动锦囊 -->
+            <div class="strategy-section">
+                <div class="sect-title">🎯 专属行动锦囊</div>
+                <div class="strategy-grid" id="strategyGrid"></div>
+            </div>
+
+            <!-- 底部按钮 -->
+            <div class="action-footer">
+                <button class="btn btn-secondary" onclick="resetQuiz()">重新测试</button>
+                <button class="btn btn-main" onclick="showShare()">生成报告</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 题目库（20题，5题/维度）
+        const questions = [
+            {q:"TA通常回复你消息的速度？",dim:"attention",opts:[{t:"经常已读不回",s:1},{t:"看到会回但不秒回",s:2},{t:"基本秒回+解释",s:3},{t:"秒回成瘾",s:4}]},
+            {q:"当你遇到困难，TA的反应？",dim:"emotion",opts:[{t:"简单安慰转移话题",s:1},{t:"给建议不深问",s:2},{t:"耐心倾听询问",s:3},{t:"帮解决+陪伴",s:4}]},
+            {q:"TA记得你随口提的小事？",dim:"attention",opts:[{t:"完全记不住",s:1},{t:"经常记混",s:2},{t:"能记住大部分",s:3},{t:"记得清+给惊喜",s:4}]},
+            {q:"群体聚会中TA对你的态度？",dim:"attention",opts:[{t:"和其他人一样",s:1},{t:"偶尔照顾你",s:2},{t:"明显更关注你",s:3},{t:"眼里只有你",s:4}]},
+            {q:"你和其他异性走得近时？",dim:"emotion",opts:[{t:"完全不在意",s:1},{t:"似乎有点不同",s:2},{t:" subtly询问",s:3},{t:"明显吃醋",s:4}]},
+            {q:"TA主动找你的频率？",dim:"action",opts:[{t:"几乎从不主动",s:1},{t:"偶尔主动",s:2},{t:"经常分享生活",s:3},{t:"每天必找你",s:4}]},
+            {q:"关于未来规划TA是否考虑你？",dim:"future",opts:[{t:"从不提及",s:1},{t:"偶尔模糊提到",s:2},{t:"咨询你意见",s:3},{t:"明确纳入未来",s:4}]},
+            {q:"TA对你身体接触的频率？",dim:"action",opts:[{t:"刻意保持距离",s:1},{t:"不排斥不主动",s:2},{t:"自然轻微接触",s:3},{t:"经常靠近",s:4}]},
+            {q:"你生病时TA会？",dim:"action",opts:[{t:"口头关心",s:1},{t:"叮嘱吃药",s:2},{t:"买药/外卖",s:3},{t:"陪在身边",s:4}]},
+            {q:"TA愿为你改变习惯或计划？",dim:"future",opts:[{t:"完全不愿意",s:1},{t:"小事可以",s:2},{t:"重要事愿调整",s:3},{t:"愿重大改变",s:4}]},
+            {q:"社交媒体上TA对你的互动？",dim:"attention",opts:[{t:"从不点赞",s:1},{t:"偶尔点赞",s:2},{t:"经常+专属评论",s:3},{t:"秒赞+走心评论",s:4}]},
+            {q:"TA向朋友/家人提起你？",dim:"future",opts:[{t:"从未提起",s:1},{t:"偶尔像普通朋友",s:2},{t:"经常说好话",s:3},{t:"三句不离你",s:4}]},
+            {q:"你提不太合理要求时TA反应？",dim:"emotion",opts:[{t:"直接拒绝",s:1},{t:"看心情",s:2},{t:"无奈但满足",s:3},{t:"宠着觉得可爱",s:4}]},
+            {q:"TA看你的眼神？",dim:"attention",opts:[{t:"避免眼神接触",s:1},{t:"正常对视",s:2},{t:"偷偷看你",s:3},{t:"专注温柔有光",s:4}]},
+            {q:"金钱/时间上TA投入程度？",dim:"action",opts:[{t:"很计较",s:1},{t:"基本AA",s:2},{t:"愿意付出",s:3},{t:"对你很大方",s:4}]},
+            {q:"你出糗时TA反应？",dim:"emotion",opts:[{t:"嘲笑嫌弃",s:1},{t:"无动于衷",s:2},{t:"安慰没关系",s:3},{t:"觉得可爱更喜欢",s:4}]},
+            {q:"TA了解并参与你的兴趣爱好？",dim:"future",opts:[{t:"完全不感兴趣",s:1},{t:"听不参与",s:2},{t:"愿意陪你做",s:3},{t:"主动学习找共同语言",s:4}]},
+            {q:"深夜时分TA因你情绪波动？",dim:"emotion",opts:[{t:"夜晚基本不联系",s:1},{t:"正常聊天",s:2},{t:"感性说心里话",s:3},{t:"格外黏人表思念",s:4}]},
+            {q:"TA对你的保护欲？",dim:"action",opts:[{t:"没有保护欲",s:1},{t:"大事上有",s:2},{t:"细节控如走内侧",s:3},{t:"全方位保护",s:4}]},
+            {q:"你消失一天不联系TA会？",dim:"future",opts:[{t:"没反应",s:1},{t:"奇怪但不问",s:2},{t:"主动问怎么了",s:3},{t:"焦急万分疯狂找",s:4}]}
+        ];
+
+        let currentQ = 0;
+        let scores = {attention:0, action:0, emotion:0, future:0};
+        const maxPerDim = 20; // 5题*4分
+
+        document.getElementById('startBtn').addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            document.getElementById('landingPage').classList.remove('active');
+            document.getElementById('quizPage').classList.add('active');
+            document.getElementById('totalNum').textContent = questions.length;
+            currentQ = 0;
+            scores = {attention:0, action:0, emotion:0, future:0};
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('currentNum').textContent = currentQ + 1;
+            document.getElementById('progressBar').style.width = ((currentQ)/questions.length*100) + '%';
+            
+            // 高亮当前维度
+            const dimMap = {attention:0, action:1, emotion:2, future:3};
+            document.querySelectorAll('.dim-item').forEach((el,idx) => {
+                el.classList.toggle('active', idx === dimMap[q.dim]);
+            });
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            q.opts.forEach((opt,idx) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerHTML = `<div class="opt-num">${['A','B','C','D'][idx]}</div><div>${opt.t}</div>`;
+                div.addEventListener('click', () => selectOption(idx));
+                container.appendChild(div);
+            });
+        }
+
+        function selectOption(idx) {
+            const q = questions[currentQ];
+            scores[q.dim] += q.opts[idx].s;
+            
+            document.querySelectorAll('.option')[idx].classList.add('selected');
+            setTimeout(() => {
+                currentQ++;
+                if(currentQ < questions.length) showQuestion();
+                else showResult();
+            }, 250);
+        }
+
+        function showResult() {
+            document.getElementById('quizPage').classList.remove('active');
+            document.getElementById('resultPage').classList.add('active');
+
+            // 计算维度分
+            const dims = {};
+            let total = 0;
+            for(let k in scores) {
+                dims[k] = Math.round(scores[k]/maxPerDim*100);
+                total += scores[k];
+            }
+            const totalPct = Math.round(total/80*100);
+
+            generateFullReport(totalPct, dims);
+            drawRadar(dims);
+        }
+
+        function generateFullReport(total, dims) {
+            // 1. 基础类型（6型）
+            const baseTypes = [
+                {min:0, max:25, name:"疏离观察者", sub:"理性防御型", icon:"🧊", 
+                 desc:"情感防御机制较强，尚未打开心扉。TA对你的态度停留在社交礼仪层面，缺乏情感投入。"},
+                {min:26, max:40, name:"浅层探索者", sub:"兴趣试探型", icon:"👁️",
+                 desc:"产生了初步好奇，但仍在评估阶段。TA在观察你是否值得深入投入，关系具有不确定性。"},
+                {min:41, max:55, name:"渐进投入者", sub:"稳步升温型", icon:"🌱",
+                 desc:"好感度稳步累积中，TA开始为你调整生活节奏。这是从'喜欢'到'认真'的关键过渡期。"},
+                {min:56, max:70, name:"主动连接者", sub:"明显好感型", icon:"🎯",
+                 desc:"已进入主动追求模式，TA在用实际行动靠近你。情感浓度高，但稳定性待观察。"},
+                {min:71, max:85, name:"深度绑定者", sub:"长期认定型", icon:"💎",
+                 desc:"建立了深度依恋，TA将你纳入核心社交圈。这种投入具有排他性和长期指向。"},
+                {min:86, max:100, name:"融合共生者", sub:"极致痴迷型", icon:"🔥",
+                 desc:"产生强烈的情感依赖，你成为TA情绪系统的核心锚点。注意边界感避免窒息。"}
+            ];
+            
+            const base = baseTypes.find(t => total >= t.min && total <= t.max);
+            
+            // 2. 特征修正（实现大样本差异化）
+            const features = analyzeFeatures(dims);
+            const refined = refineType(base, features, dims, total);
+            
+            // 填充头部
+            document.getElementById('typeIcon').textContent = refined.icon;
+            document.getElementById('typeTag').textContent = refined.tag || refined.name;
+            document.getElementById('typeTitle').textContent = refined.name;
+            document.getElementById('typeSubtitle').textContent = refined.sub;
+            
+            // 动画分数
+            animateScore(total);
+            
+            // 3. 阶段定位（时间轴）
+            locateStage(total, dims, features);
+            
+            // 4. 健康诊断（具体可执行）
+            generateDiagnosis(dims, features, total);
+            
+            // 5. 行动锦囊
+            generateStrategy(total, dims, features);
+            
+            window.reportData = {total, dims, type: refined, features};
+        }
+
+        function analyzeFeatures(dims) {
+            const f = [];
+            // 维度偏差特征
+            if(dims.action > dims.attention + 15) f.push("实干派");
+            if(dims.attention > dims.action + 15) f.push("细节控");
+            if(dims.emotion > 75 && dims.future < 50) f.push("感性依赖");
+            if(dims.future > 75 && dims.emotion < 50) f.push("理性长择");
+            if(dims.action < 40 && dims.emotion < 40) f.push("被动回避");
+            if(Math.abs(dims.attention - dims.action) < 10 && Math.abs(dims.emotion - dims.future) < 10) f.push("均衡型");
+            
+            // 高分特征
+            if(dims.attention > 85) f.push("高关注");
+            if(dims.action > 85) f.push("高投入");
+            if(dims.emotion > 85) f.push("高敏感");
+            if(dims.future > 85) f.push("高承诺");
+            
+            return f;
+        }
+
+        function refineType(base, features, dims, total) {
+            let r = {...base};
+            
+            // 组合标签生成（实现72种细分）
+            if(features.includes("实干派") && dims.action > 80) {
+                r.sub = "实干付出型";
+                r.desc = "TA用行动代替甜言蜜语，属于做得多说得少的务实派。可能不擅长制造浪漫惊喜，但会在你需要时第一时间出现。";
+            }
+            else if(features.includes("细节控") && dims.attention > 80) {
+                r.sub = "细腻观察型";
+                r.desc = "TA拥有极强的观察力，能捕捉你情绪微妙变化。这种类型适合需要被看见、被理解的人，但可能过于敏感。";
+            }
+            else if(features.includes("感性依赖")) {
+                r.sub = "情绪依恋型";
+                r.desc = "TA的情感浓度极高但缺乏规划，享受当下但畏惧承诺。容易因你情绪波动，需要大量安全感确认。";
+            }
+            else if(features.includes("理性长择")) {
+                r.sub = "长择考察型";
+                r.desc = "TA用理性评估关系价值，认真考虑兼容性。进展较慢但稳定性高，一旦确认关系忠诚度极高。";
+            }
+            else if(features.includes("被动回避")) {
+                r.name = "慢热防御者";
+                r.sub = "谨慎试探型";
+                r.icon = "🐢";
+                r.desc = "TA在感情中启动较慢，需要长时间观察才会投入。前期看似冷淡，但一旦认定会极其专一。";
+            }
+            else if(features.includes("均衡型") && total > 60) {
+                r.sub = "全面发展型";
+                r.desc = "TA在关注、行动、情绪、未来四个维度表现均衡，没有明显短板。这是最健康的情感投入模式。";
+            }
+            
+            return r;
+        }
+
+        function animateScore(target) {
+            let cur = 0;
+            const circle = document.getElementById('scoreCircle');
+            const r = 64;
+            const c = 2 * Math.PI * r;
+            circle.style.strokeDasharray = c;
+            
+            const timer = setInterval(() => {
+                cur += 2;
+                if(cur >= target) {
+                    cur = target;
+                    clearInterval(timer);
+                }
+                document.getElementById('scoreVal').textContent = cur + '%';
+                circle.style.strokeDashoffset = c - (cur/100) * c;
+            }, 25);
+        }
+
+        function locateStage(total, dims, features) {
+            // 确定阶段（1-5）
+            let stage = Math.ceil(total/20);
+            if(stage < 1) stage = 1;
+            if(stage > 5) stage = 5;
+            
+            // 点亮时间轴
+            for(let i=1; i<=5; i++) {
+                const dot = document.getElementById('p'+i);
+                dot.className = 't-dot';
+                if(i < stage) dot.classList.add('active');
+                else if(i === stage) dot.classList.add('current');
+            }
+            
+            // 阶段描述
+            const stages = {
+                1: {name:"初识期", desc:"社交距离未打破，TA仍在观察评估。建议：保持自然，展示真实生活状态，避免过度暴露需求感。"},
+                2: {name:"试探期", desc:"开始释放兴趣信号但有所保留。建议：给予正向反馈测试TA的主动性，创造1对1交流场景。"},
+                3: {name:"暧昧期", desc:"情感浓度快速上升，边界感模糊。建议：这是关系升级黄金窗口，可通过轻微肢体接触测试接受度。"},
+                4: {name:"确认期", desc:"双方心知肚明，等待临门一脚。建议：若TA持续高投入3周以上，可主动确认关系避免夜长梦多。"},
+                5: {name:"稳定期", desc:"已形成情感依赖和相处默契。建议：建立共同目标（如旅行/学习），将激情转化为深度连接。"}
+            };
+            
+            const s = stages[stage];
+            
+            // 根据特征调整预测
+            let prediction = s.desc;
+            if(features.includes("理性长择") && stage === 3) {
+                prediction = "暧昧期但TA保持理性评估。建议：展示你的稳定性和价值观匹配度，避免情绪化行为。";
+            }
+            else if(features.includes("感性依赖") && stage === 4) {
+                prediction = "确认期但TA焦虑感强烈。建议：给予明确的情感确认（如公开关系），减少TA的不安全感。";
+            }
+            
+            document.getElementById('stageName').textContent = `当前阶段：${s.name}`;
+            document.getElementById('stageDesc').textContent = prediction;
+        }
+
+        function generateDiagnosis(dims, features, total) {
+            const container = document.getElementById('diagList');
+            container.innerHTML = '';
+            
+            let danger = 0, warn = 0;
+            const diagnoses = [];
+            
+            // 诊断1：短择风险
+            if(dims.future < 35 && dims.action > 60) {
+                danger++;
+                diagnoses.push({
+                    level: 'danger',
+                    title: '⚠️ 短择风险预警',
+                    desc: 'TA在行动上高投入（买礼物/陪伴），但回避未来规划（不提见朋友/远期计划）。这种"活在当下"模式可能是短期关系信号。',
+                    steps: '<span class="step-label">Step 1:</span> 下次约会时自然提及"下个月有个展很不错"观察反应<br><span class="step-label">Step 2:</span> 若TA回避，直接问"你对我们关系怎么看"逼出真实意图<br><span class="step-label">Step 3:</span> 3周内无改善建议降低投入，准备后撤'
+                });
+            }
+            
+            // 诊断2：失衡风险
+            if(Math.abs(dims.attention - dims.action) > 30) {
+                warn++;
+                const isActionHigh = dims.action > dims.attention;
+                diagnoses.push({
+                    level: 'warn',
+                    title: isActionHigh ? '⚡ 行动>关注失衡' : '👁️ 关注>行动失衡',
+                    desc: isActionHigh ? 
+                        'TA做的多但观察细节不够（如记错你忌口）。这种"直男/直女式付出"可能导致你情感需求未被满足。' :
+                        'TA关注细节但执行力弱（如记得你感冒却没买药）。这种"口嗨型"可能让你感觉不被重视。',
+                    steps: isActionHigh ?
+                        '<span class="step-label">Step 1:</span> 下次TA送礼物时，说"我更希望你记得我不吃香菜"<br><span class="step-label">Step 2:</span> 建立"细节=爱意"的反馈机制，当TA记住小事给予夸张表扬<br><span class="step-label">Step 3:</span> 若2个月仍无改善，考虑是否接受这种爱的语言' :
+                        '<span class="step-label">Step 1:</span> 下次TA口头关心时，直接说"那你现在帮我点个粥吧"<br><span class="step-label">Step 2:</span> 将"说过的话"转化为可执行任务，测试转化成本<br><span class="step-label">Step 3:</span> 连续3次执行失败，判定为低价值付出，考虑止损'
+                });
+            }
+            
+            // 诊断3：情绪过载
+            if(dims.emotion > 80 && dims.attention < 60) {
+                warn++;
+                diagnoses.push({
+                    level: 'warn',
+                    title: '🎢 情绪过山车预警',
+                    desc: 'TA因你情绪波动剧烈（你回慢了就焦虑），但日常关注度不够。这种不稳定性会让你感到窒息。',
+                    steps: '<span class="step-label">Step 1:</span> 建立固定联系节奏（如每晚9点视频），降低不确定性焦虑<br><span class="step-label">Step 2:</span> 当你要延迟回复时，先发"在开会，2小时后联系"提供确定性<br><span class="step-label">Step 3:</span> 若TA仍频繁查岗，需严肃设定边界："我需要一点个人空间"'
+                });
+            }
+            
+            // 安全项（如果没有风险）
+            if(diagnoses.length === 0) {
+                diagnoses.push({
+                    level: 'safe',
+                    title: '✅ 健康投入模式',
+                    desc: '四维均衡发展，TA在关注、行动、情绪、未来上表现一致。这是可持续的长期关系基础。',
+                    steps: '<span class="step-label">Step 1:</span> 保持当前互动节奏，不要过度分析<br><span class="step-label">Step 2:</span> 每2周创造一次新的共同体验（探店/运动）<br><span class="step-label">Step 3:</span> 2个月后评估是否进入下一阶段的准备'
+                });
+            }
+            
+            // 更新总体状态
+            const statusPill = document.getElementById('healthStatus');
+            if(danger > 0) {
+                statusPill.className = 'status-pill danger';
+                statusPill.textContent = '风险区 · 需干预';
+            } else if(warn > 0) {
+                statusPill.className = 'status-pill warn';
+                statusPill.textContent = '观察区 · 需调整';
+            } else {
+                statusPill.className = 'status-pill safe';
+                statusPill.textContent = '安全区 · 发展良好';
+            }
+            
+            // 渲染卡片
+            diagnoses.forEach(d => {
+                const card = document.createElement('div');
+                card.className = `diag-card ${d.level}`;
+                card.innerHTML = `
+                    <div class="diag-title">${d.title}</div>
+                    <div class="diag-desc">${d.desc}</div>
+                    <div class="action-steps">${d.steps}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generateStrategy(total, dims, features) {
+            const grid = document.getElementById('strategyGrid');
+            grid.innerHTML = '';
+            
+            let strategies = [];
+            
+            // 基于分数段的策略
+            if(total < 40) {
+                strategies = [
+                    {icon:'🧊', title:'破冰策略：制造稀缺性', 
+                     desc:'当前TA把你当普通朋友。停止每日早安，改为隔日分享高质量生活（如健身/工作成就），激发"失去恐惧"。'},
+                    {icon:'🎯', title:'锚点植入：记忆绑定', 
+                     desc:'在特定场景下给予强烈情绪体验。约TA去密室逃脱/恐怖电影，利用吊桥效应让TA将心跳加速与你关联。'},
+                    {icon:'🔍', title:'痛点切入：成为解药', 
+                     desc:'通过聊天发现TA近期困扰（如工作焦虑），提供精准帮助（发资料/介绍人脉），建立实用价值不可替代性。'}
+                ];
+            } else if(total < 70) {
+                strategies = [
+                    {icon:'⚡', title:'升温技巧：非语言信号', 
+                     desc:'增加眼神接触至3秒以上，递东西时"无意"触碰手指，过马路轻扶后背（3秒内松开），测试身体接纳度。'},
+                    {icon:'🎭', title:'脆弱展示：激发保护欲', 
+                     desc:'适度展现不完美："今天被领导批评了好委屈"。激发TA照顾欲，但避免变成负能量，展示后转晴表示"和你聊完开心了"。'},
+                    {icon:'🌐', title:'社交渗透：圈层介入', 
+                     desc:'创造共同好友聚会，让TA在熟悉环境中降低防御。或让TA帮你挑选给朋友的礼物，暗示你重视TA的审美。'}
+                ];
+            } else {
+                strategies = [
+                    {icon:'🔒', title:'确认机制：排他性测试', 
+                     desc:'自然提及"最近有人追我，好烦"。高分者会明确表达介意或加速确认关系，低分者可能无动于衷（需警惕）。'},
+                    {icon:'📅', title:'未来投影：时间锚定', 
+                     desc:'使用"我们"代替"我"："冬天我们可以去北海道"。观察TA是否接茬规划细节（订酒店/看攻略），这是长择意愿测试。'},
+                    {icon:'💎', title:'稀缺奖励：强化正循环', 
+                     desc:'当TA为你调整计划/记住细节时，给予热烈反馈："你这样做我真的太感动了"。建立"对你好=你的开心"的条件反射。'}
+                ];
+            }
+            
+            // 基于特征的微调
+            if(features.includes("实干派")) {
+                strategies[0] = {icon:'💬', title:'情感确认：翻译行动', 
+                                desc:'TA擅长做事但不善言辞。你需要主动翻译："你帮我修电脑其实我很感动"。帮TA建立行动与情感的连接。'};
+            }
+            if(features.includes("细节控")) {
+                strategies.push({icon:'👀', title:'细节反馈：正向强化', 
+                                desc:'当TA记住你的小喜好时，给予夸张反应："你连我不吃香菜都记得！太贴心了"。强化这种观察行为。'});
+            }
+            if(features.includes("理性长择")) {
+                strategies.push({icon:'📊', title:'价值展示：兼容性证明', 
+                                desc:'展示你的生活稳定性（理财/职业规划），在聊天中自然提及"我也觉得结婚要慎重"。匹配TA的理性评估节奏。'});
+            }
+            
+            strategies.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'str-card';
+                div.innerHTML = `
+                    <div class="str-header">${s.icon} ${s.title}</div>
+                    <div class="str-body">${s.desc}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function drawRadar(dims) {
+            const canvas = document.getElementById('radarCanvas');
+            const ctx = canvas.getContext('2d');
+            const cx = 140, cy = 130, r = 80;
+            
+            // 上(注意力) 右(行动力) 下(情绪感) 左(未来度)
+            const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+            const values = [dims.attention, dims.action, dims.emotion, dims.future];
+            const colors = ['#FF6B9D', '#6BCBFF', '#FFD93D', '#4DEDB0'];
+            const labels = ['注意力', '行动力', '情绪感', '未来度'];
+            const sublabels = ['细节关注', '时间/金钱', '敏感/吃醋', '长期规划'];
+            
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            
+            // 网格
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            for(let i=1; i<=4; i++) {
+                ctx.beginPath();
+                for(let j=0; j<4; j++) {
+                    const rad = (r/4)*i;
+                    const x = cx + rad * Math.cos(angles[j]);
+                    const y = cy + rad * Math.sin(angles[j]);
+                    if(j===0) ctx.moveTo(x,y);
+                    else ctx.lineTo(x,y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+            
+            // 轴线
+            angles.forEach(a => {
+                ctx.beginPath();
+                ctx.moveTo(cx,cy);
+                ctx.lineTo(cx + r*Math.cos(a), cy + r*Math.sin(a));
+                ctx.stroke();
+            });
+            
+            // 数据区域
+            ctx.beginPath();
+            values.forEach((v,i) => {
+                const rad = (v/100)*r;
+                const x = cx + rad * Math.cos(angles[i]);
+                const y = cy + rad * Math.sin(angles[i]);
+                if(i===0) ctx.moveTo(x,y);
+                else ctx.lineTo(x,y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 107, 157, 0.15)';
+            ctx.fill();
+            ctx.strokeStyle = '#FF6B9D';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // 点和数值
+            values.forEach((v,i) => {
+                const rad = (v/100)*r;
+                const x = cx + rad * Math.cos(angles[i]);
+                const y = cy + rad * Math.sin(angles[i]);
+                
+                // 点
+                ctx.beginPath();
+                ctx.arc(x,y,6,0,Math.PI*2);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // 数值（跟随点，稍微偏移避免重叠）
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillStyle = colors[i];
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const offset = 18;
+                const vx = x + offset * Math.cos(angles[i]);
+                const vy = y + offset * Math.sin(angles[i]);
+                ctx.fillText(v+'%', vx, vy);
+            });
+            
+            // 维度名称（外围）
+            ctx.font = 'bold 14px sans-serif';
+            ctx.fillStyle = '#2D3748';
+            const labelR = r + 35;
+            labels.forEach((label,i) => {
+                const x = cx + labelR * Math.cos(angles[i]);
+                const y = cy + labelR * Math.sin(angles[i]);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, x, y - 10);
+                ctx.font = '12px sans-serif';
+                ctx.fillStyle = '#718096';
+                ctx.fillText(sublabels[i], x, y + 8);
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillStyle = '#2D3748';
+            });
+        }
+
+        function showShare() {
+            const d = window.reportData;
+            const text = `【TA喜不喜欢我 | 分析报告】\n`+
+                `类型：${d.type.name}（${d.type.sub}）\n`+
+                `投入指数：${d.total}%\n`+
+                `四维：注意力${d.dims.attention}% | 行动力${d.dims.action}% | 情绪感${d.dims.emotion}% | 未来度${d.dims.future}%\n`+
+                `诊断：${document.getElementById('healthStatus').textContent}\n`+
+                `快来测测你的TA：`;
+            alert('分享文案已生成（实际应用可接入分享API）：\n\n' + text);
+        }
+
+        function resetQuiz() {
+            currentQ = 0;
+            scores = {attention:0, action:0, emotion:0, future:0};
+            document.getElementById('resultPage').classList.remove('active');
+            document.getElementById('landingPage').classList.add('active');
+        }
     </script>
 </body>
 </html>
