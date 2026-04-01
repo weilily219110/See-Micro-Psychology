@@ -22,12 +22,13 @@ export class QuizService {
     const sampleQuizzes = [
       {
         id: 'quiz-001',
-        title: '心理健康自评量表',
-        description: '通过专业量表评估您的心理健康状态',
+        title: 'TA喜不喜欢我',
+        description: '基于四维情感投入模型，20道场景题精准解析TA的投入程度',
         coverUrl: '',
         priceRef: 1,
         status: 1,
         sortOrder: 1,
+        htmlUrl: '/quizzes/ta-love-quiz.html', // 外部HTML测评
         createdAt: new Date().toISOString(),
       },
       {
@@ -54,29 +55,44 @@ export class QuizService {
     
     sampleQuizzes.forEach(q => {
       quizzes.set(q.id, q)
-      quizContents.set(q.id, {
-        quizId: q.id,
-        content: {
+      
+      // 如果有 htmlUrl，说明是外部HTML测评，内容通过iframe加载
+      if (q.htmlUrl) {
+        quizContents.set(q.id, {
+          quizId: q.id,
+          isExternalHtml: true,
+          htmlUrl: q.htmlUrl,
           title: q.title,
           coverImage: q.coverUrl,
           intro: q.description,
-          questions: [
-            {
-              id: 'q1',
-              type: 'choice',
-              question: '最近一周，您感到心情愉悦的频率？',
-              options: [
-                { id: 'a', text: '几乎没有' },
-                { id: 'b', text: '偶尔' },
-                { id: 'c', text: '经常' },
-                { id: 'd', text: '每天都是' },
-              ],
-            },
-          ],
-        },
-        version: 1,
-        updatedAt: new Date().toISOString(),
-      })
+          version: 1,
+          updatedAt: new Date().toISOString(),
+        })
+      } else {
+        quizContents.set(q.id, {
+          quizId: q.id,
+          content: {
+            title: q.title,
+            coverImage: q.coverUrl,
+            intro: q.description,
+            questions: [
+              {
+                id: 'q1',
+                type: 'choice',
+                question: '最近一周，您感到心情愉悦的频率？',
+                options: [
+                  { id: 'a', text: '几乎没有' },
+                  { id: 'b', text: '偶尔' },
+                  { id: 'c', text: '经常' },
+                  { id: 'd', text: '每天都是' },
+                ],
+              },
+            ],
+          },
+          version: 1,
+          updatedAt: new Date().toISOString(),
+        })
+      }
     })
   }
   

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TA喜不喜欢我 | 情感投入度专业测评</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #FFF9FB 0%, #FFFFFF 50%, #F0F9FF 100%); min-height: 100vh; color: #2D3748; }
+        .page { display: none; min-height: 100vh; padding: 24px 20px; }
+        .page.active { display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 420px; width: 100%; text-align: center; margin-top: 8vh; }
+        .brand { width: 100px; height: 100px; margin: 0 auto 24px; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 16px 32px rgba(255,107,157,0.3); }
+        h1 { font-size: 36px; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { font-size: 16px; color: #718096; line-height: 1.8; margin-bottom: 32px; }
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+        .feature { background: white; border-radius: 12px; padding: 16px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .feature-icon { font-size: 24px; margin-bottom: 8px; }
+        .feature-text { font-size: 12px; color: #718096; font-weight: 600; }
+        .btn { background: linear-gradient(135deg, #FF6B9D, #FF8F5D); color: white; border: none; padding: 18px 48px; font-size: 16px; border-radius: 30px; cursor: pointer; font-weight: 700; box-shadow: 0 8px 24px rgba(255,107,157,0.3); }
+        .btn:hover { transform: translateY(-2px); }
+        .quiz-card { width: 100%; max-width: 420px; background: white; border-radius: 20px; padding: 28px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-top: 16px; text-align: left; }
+        .progress { height: 6px; background: #F0F0F0; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #FF6B9D, #FF8F5D); transition: width 0.3s; width: 0%; }
+        .counter { font-size: 14px; color: #FF6B9D; font-weight: 700; margin-bottom: 12px; }
+        .question { font-size: 18px; font-weight: 700; margin-bottom: 24px; line-height: 1.5; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option { background: #FFF9FB; border: 2px solid transparent; padding: 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: #718096; text-align: left; }
+        .option:hover { background: white; border-color: #FFB8D0; transform: translateX(4px); }
+        .option.selected { background: rgba(255,107,157,0.1); border-color: #FF6B9D; color: #FF6B9D; font-weight: 600; }
+        .result { width: 100%; max-width: 460px; text-align: center; }
+        .result-card { background: white; border-radius: 24px; padding: 32px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-bottom: 20px; }
+        .type-icon { font-size: 60px; margin-bottom: 16px; }
+        .type-name { font-size: 24px; font-weight: 800; color: #2D3748; margin-bottom: 8px; }
+        .type-sub { font-size: 14px; color: #718096; margin-bottom: 24px; }
+        .score-circle { width: 140px; height: 140px; margin: 0 auto 24px; position: relative; }
+        .score-svg { transform: rotate(-90deg); }
+        .score-bg { fill: none; stroke: #FFF0F3; stroke-width: 10; }
+        .score-fill { fill: none; stroke: url(#grad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 0 377; transition: stroke-dasharray 1.5s ease; }
+        .score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .score-val { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .score-label { font-size: 12px; color: #A0AEC0; font-weight: 600; }
+        .dims { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 8px 32px rgba(255,107,157,0.15); margin-bottom: 20px; text-align: left; }
+        .dims h3 { font-size: 16px; margin-bottom: 16px; text-align: center; }
+        .dim-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .dim-name { font-size: 14px; color: #718096; }
+        .dim-bar { flex: 1; height: 8px; background: #F0F0F0; border-radius: 4px; margin: 0 12px; overflow: hidden; }
+        .dim-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .dim-val { font-size: 14px; font-weight: 700; min-width: 40px; }
+        .footer { display: flex; gap: 12px; width: 100%; max-width: 460px; }
+        .btn-secondary { flex: 1; padding: 16px; border-radius: 14px; border: 2px solid #E0E0E0; background: #F7F7F7; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .btn-main { flex: 1; padding: 16px; border-radius: 14px; border: none; background: linear-gradient(135deg, #FF6B9D, #FF8F5D); color: white; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(255,107,157,0.3); }
+    </style>
+</head>
+<body>
+    <svg width="0" height="0"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#FF6B9D"/><stop offset="100%" style="stop-color:#FF8F5D"/></linearGradient></defs></svg>
+    
+    <!-- 引导页 -->
+    <div class="page active" id="landing">
+        <div class="container">
+            <div class="brand">💖</div>
+            <h1>TA喜不喜欢我</h1>
+            <p class="subtitle">基于四维情感投入模型<br>20道场景题精准解析<br>生成可执行的恋爱战略报告</p>
+            <div class="features">
+                <div class="feature"><div class="feature-icon">🎯</div><div class="feature-text">4维雷达扫描</div></div>
+                <div class="feature"><div class="feature-icon">⚠️</div><div class="feature-text">短择风险预警</div></div>
+                <div class="feature"><div class="feature-icon">💡</div><div class="feature-text">专属行动锦囊</div></div>
+            </div>
+            <button class="btn" onclick="start()">开始测试</button>
+        </div>
+    </div>
+    
+    <!-- 测试页 -->
+    <div class="page" id="quiz">
+        <div class="quiz-card">
+            <div class="progress"><div class="progress-fill" id="progress"></div></div>
+            <div class="counter"><span id="current">1</span> / 20</div>
+            <div class="question" id="question">加载中...</div>
+            <div class="options" id="options"></div>
+        </div>
+    </div>
+    
+    <!-- 结果页 -->
+    <div class="page" id="result">
+        <div class="result">
+            <div class="result-card">
+                <div class="type-icon" id="typeIcon">🧊</div>
+                <div class="type-name" id="typeName">--</div>
+                <div class="type-sub" id="typeSub">分析中...</div>
+                <div class="score-circle">
+                    <svg class="score-svg" viewBox="0 0 140 140"><circle class="score-bg" cx="70" cy="70" r="60"/><circle class="score-fill" id="scoreCircle" cx="70" cy="70" r="60"/></svg>
+                    <div class="score-text"><div class="score-val" id="scoreVal">0%</div><div class="score-label">投入指数</div></div>
+                </div>
+            </div>
+            <div class="dims">
+                <h3>📊 四维能力分析</h3>
+                <div class="dim-row"><span class="dim-name">注意力</span><div class="dim-bar"><div class="dim-fill" id="d1" style="width:0%;background:#FF6B9D"></div></div><span class="dim-val" id="v1">0%</span></div>
+                <div class="dim-row"><span class="dim-name">行动力</span><div class="dim-bar"><div class="dim-fill" id="d2" style="width:0%;background:#6BCBFF"></div></div><span class="dim-val" id="v2">0%</span></div>
+                <div class="dim-row"><span class="dim-name">情绪感</span><div class="dim-bar"><div class="dim-fill" id="d3" style="width:0%;background:#FFD93D"></div></div><span class="dim-val" id="v3">0%</span></div>
+                <div class="dim-row"><span class="dim-name">未来度</span><div class="dim-bar"><div class="dim-fill" id="d4" style="width:0%;background:#4DEDB0"></div></div><span class="dim-val" id="v4">0%</span></div>
+            </div>
+            <div class="footer">
+                <button class="btn-secondary" onclick="reset()">重新测试</button>
+                <button class="btn-main" onclick="share()">生成分享</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+const questions=[
+{q:"TA通常回复你消息的速度？",dim:0,opts:[{t:"经常已读不回",s:1},{t:"看到会回但不秒回",s:2},{t:"基本秒回+解释",s:3},{t:"秒回成瘾",s:4}]},
+{q:"当你遇到困难，TA的反应？",dim:2,opts:[{t:"简单安慰转移话题",s:1},{t:"给建议不深问",s:2},{t:"耐心倾听询问",s:3},{t:"帮解决+陪伴",s:4}]},
+{q:"TA记得你随口提的小事？",dim:0,opts:[{t:"完全记不住",s:1},{t:"经常记混",s:2},{t:"能记住大部分",s:3},{t:"记得清+给惊喜",s:4}]},
+{q:"群体聚会中TA对你的态度？",dim:0,opts:[{t:"和其他人一样",s:1},{t:"偶尔照顾你",s:2},{t:"明显更关注你",s:3},{t:"眼里只有你",s:4}]},
+{q:"你和其他异性走得近时？",dim:2,opts:[{t:"完全不在意",s:1},{t:"似乎有点不同",s:2},{t:"subtly询问",s:3},{t:"明显吃醋",s:4}]},
+{q:"TA主动找你的频率？",dim:1,opts:[{t:"几乎从不主动",s:1},{t:"偶尔主动",s:2},{t:"经常分享生活",s:3},{t:"每天必找你",s:4}]},
+{q:"关于未来规划TA是否考虑你？",dim:3,opts:[{t:"从不提及",s:1},{t:"偶尔模糊提到",s:2},{t:"咨询你意见",s:3},{t:"明确纳入未来",s:4}]},
+{q:"TA对你身体接触的频率？",dim:1,opts:[{t:"刻意保持距离",s:1},{t:"不排斥不主动",s:2},{t:"自然轻微接触",s:3},{t:"经常靠近",s:4}]},
+{q:"你生病时TA会？",dim:1,opts:[{t:"口头关心",s:1},{t:"叮嘱吃药",s:2},{t:"买药/外卖",s:3},{t:"陪在身边",s:4}]},
+{q:"TA愿为你改变习惯或计划？",dim:3,opts:[{t:"完全不愿意",s:1},{t:"小事可以",s:2},{t:"重要事愿调整",s:3},{t:"愿重大改变",s:4}]},
+{q:"社交媒体上TA对你的互动？",dim:0,opts:[{t:"从不点赞",s:1},{t:"偶尔点赞",s:2},{t:"经常+专属评论",s:3},{t:"秒赞+走心评论",s:4}]},
+{q:"TA向朋友/家人提起你？",dim:3,opts:[{t:"从未提起",s:1},{t:"偶尔像普通朋友",s:2},{t:"经常说好话",s:3},{t:"三句不离你",s:4}]},
+{q:"你提不太合理要求时TA反应？",dim:2,opts:[{t:"直接拒绝",s:1},{t:"看心情",s:2},{t:"无奈但满足",s:3},{t:"宠着觉得可爱",s:4}]},
+{q:"TA看你的眼神？",dim:0,opts:[{t:"避免眼神接触",s:1},{t:"正常对视",s:2},{t:"偷偷看你",s:3},{t:"专注温柔有光",s:4}]},
+{q:"金钱/时间上TA投入程度？",dim:1,opts:[{t:"很计较",s:1},{t:"基本AA",s:2},{t:"愿意付出",s:3},{t:"对你很大方",s:4}]},
+{q:"你出糗时TA反应？",dim:2,opts:[{t:"嘲笑嫌弃",s:1},{t:"无动于衷",s:2},{t:"安慰没关系",s:3},{t:"觉得可爱更喜欢",s:4}]},
+{q:"TA了解并参与你的兴趣爱好？",dim:3,opts:[{t:"完全不感兴趣",s:1},{t:"听不参与",s:2},{t:"愿意陪你做",s:3},{t:"主动学习找共同语言",s:4}]},
+{q:"深夜时分TA因你情绪波动？",dim:2,opts:[{t:"夜晚基本不联系",s:1},{t:"正常聊天",s:2},{t:"感性说心里话",s:3},{t:"格外黏人表思念",s:4}]},
+{q:"TA对你的保护欲？",dim:1,opts:[{t:"没有保护欲",s:1},{t:"大事上有",s:2},{t:"细节控如走内侧",s:3},{t:"全方位保护",s:4}]},
+{q:"你消失一天不联系TA会？",dim:3,opts:[{t:"没反应",s:1},{t:"奇怪但不问",s:2},{t:"主动问怎么了",s:3},{t:"焦急万分疯狂找",s:4}]}
+];
+let cur=0, scores=[0,0,0,0];
+const dimNames=["注意力","行动力","情绪感","未来度"];
+
+function start(){
+    document.getElementById("landing").classList.remove("active");
+    document.getElementById("quiz").classList.add("active");
+    show();
+}
+function show(){
+    const q=questions[cur];
+    document.getElementById("current").textContent=cur+1;
+    document.getElementById("progress").style.width=(cur/questions.length*100)+"%";
+    document.getElementById("question").textContent=q.q;
+    const container=document.getElementById("options");
+    container.innerHTML="";
+    q.opts.forEach((o,i)=>{
+        const div=document.createElement("div");
+        div.className="option"; div.textContent=o.t;
+        div.onclick=()=>select(i);
+        container.appendChild(div);
+    });
+}
+function select(i){
+    scores[questions[cur].dim]+=questions[cur].opts[i].s;
+    document.querySelectorAll(".option")[i].classList.add("selected");
+    setTimeout(()=>{
+        cur++;
+        if(cur<questions.length) show();
+        else showResult();
+    },200);
+}
+function showResult(){
+    document.getElementById("quiz").classList.remove("active");
+    document.getElementById("result").classList.add("active");
+    const dims=scores.map(s=>Math.round(s/20*100));
+    const total=Math.round(dims.reduce((a,b)=>a+b,0)/4);
+    const types=[
+        {min:0,max:25,name:"疏离观察者",sub:"理性防御型",icon:"🧊"},
+        {min:26,max:40,name:"浅层探索者",sub:"兴趣试探型",icon:"👁️"},
+        {min:41,max:55,name:"渐进投入者",sub:"稳步升温型",icon:"🌱"},
+        {min:56,max:70,name:"主动连接者",sub:"明显好感型",icon:"🎯"},
+        {min:71,max:85,name:"深度绑定者",sub:"长期认定型",icon:"💎"},
+        {min:86,max:100,name:"融合共生者",sub:"极致痴迷型",icon:"🔥"}
+    ];
+    const type=types.find(t=>total>=t.min&&total<=t.max);
+    document.getElementById("typeIcon").textContent=type.icon;
+    document.getElementById("typeName").textContent=type.name;
+    document.getElementById("typeSub").textContent=type.sub;
+    dims.forEach((d,i)=>{
+        document.getElementById("d"+(i+1)).style.width=d+"%";
+        document.getElementById("v"+(i+1)).textContent=d+"%";
+    });
+    const circle=document.getElementById("scoreCircle");
+    const r=60, c=2*Math.PI*r;
+    circle.style.strokeDasharray="0 "+c;
+    setTimeout(()=>{circle.style.strokeDasharray=(total/100*c)+" "+c;},100);
+    document.getElementById("scoreVal").textContent=total+"%";
+}
+function reset(){cur=0;scores=[0,0,0,0];document.getElementById("result").classList.remove("active");document.getElementById("landing").classList.add("active");}
+function share(){alert("分享功能开发中...");}
+    </script>
+</body>
+</html>

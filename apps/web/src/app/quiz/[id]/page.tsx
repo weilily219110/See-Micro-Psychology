@@ -16,6 +16,8 @@ interface QuizContent {
   coverImage: string
   intro: string
   questions: Question[]
+  isExternalHtml?: boolean
+  htmlUrl?: string
 }
 
 export default function QuizPage() {
@@ -29,6 +31,8 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [isExternalHtml, setIsExternalHtml] = useState(false)
+  const [htmlUrl, setHtmlUrl] = useState('')
   
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
@@ -48,7 +52,17 @@ export default function QuizPage() {
       
       // 获取测评内容
       const data = await getQuizContent(quizId, token)
-      setContent(data.content || data.data?.content)
+      const quizData = data.content || data.data
+      
+      // 检查是否是外部HTML测评
+      if (quizData?.isExternalHtml) {
+        setIsExternalHtml(true)
+        setHtmlUrl(quizData.htmlUrl)
+        setLoading(false)
+        return
+      }
+      
+      setContent(quizData)
       
       // 获取用户状态确认已解锁（作为备用校验）
       const status = await getUserStatus()
@@ -99,6 +113,28 @@ export default function QuizPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">加载中...</div>
+      </div>
+    )
+  }
+
+  // 外部HTML测评 - 使用iframe加载
+  if (isExternalHtml && htmlUrl) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-white shadow-sm sticky top-0 z-10">
+          <div className="max-w-2xl mx-auto px-4 py-4">
+            <h1 className="text-xl font-bold text-gray-900">见微心理</h1>
+          </div>
+        </header>
+        <main className="max-w-2xl mx-auto px-4 py-4">
+          <iframe
+            ref={iframeRef}
+            src={htmlUrl}
+            className="w-full min-h-screen border-0 rounded-xl"
+            title="测评"
+            allow="clipboard-write"
+          />
+        </main>
       </div>
     )
   }
