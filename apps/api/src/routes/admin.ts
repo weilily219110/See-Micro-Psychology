@@ -1,8 +1,55 @@
 import { Router } from 'express'
 import { AdminService } from '../services/adminService.js'
+import { AdminAuthService } from '../services/adminAuthService.js'
 
 export const adminRoutes = Router()
 const adminService = new AdminService()
+const adminAuthService = new AdminAuthService()
+
+// POST /api/admin/login - Admin 登录
+adminRoutes.post('/login', async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: '请提供邮箱和密码',
+      })
+    }
+
+    // 校验邮箱
+    if (!adminAuthService.validateEmail(email)) {
+      return res.status(401).json({
+        success: false,
+        error: '用户名或密码错误',
+      })
+    }
+
+    // 校验密码
+    const isValid = await adminAuthService.validatePassword(password)
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: '用户名或密码错误',
+      })
+    }
+
+    // 生成 Token
+    const token = adminAuthService.generateToken(email)
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        email,
+        expiresIn: '24h',
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+})
 
 // POST /api/admin/code/generate - 生成兑换码
 adminRoutes.post('/code/generate', async (req, res, next) => {
