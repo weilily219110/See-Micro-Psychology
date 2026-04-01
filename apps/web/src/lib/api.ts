@@ -54,6 +54,12 @@ export async function unlockQuiz(quizId: string) {
   return response.data
 }
 
+// 获取测评访问 Token
+export async function getQuizToken(quizId: string) {
+  const response = await api.get(`/api/quiz/${quizId}/token`)
+  return response.data
+}
+
 // 获取测评内容
 export async function getQuizContent(quizId: string, token: string) {
   const response = await api.get(`/api/quiz/${quizId}/content`, {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { getQuizContent, completeQuiz, getUserStatus } from '@/lib/api'
+import { getQuizContent, getQuizToken, completeQuiz, getUserStatus } from '@/lib/api'
 
 interface Question {
   id: string
@@ -38,11 +38,19 @@ export default function QuizPage() {
 
   const loadQuiz = async () => {
     try {
+      // 先获取测评访问 Token
+      const tokenData = await getQuizToken(quizId)
+      const token = tokenData.data?.token
+      
+      if (!token) {
+        throw new Error('获取测评Token失败')
+      }
+      
       // 获取测评内容
-      const data = await getQuizContent(quizId, '')
+      const data = await getQuizContent(quizId, token)
       setContent(data.content || data.data?.content)
       
-      // 获取用户状态确认已解锁
+      // 获取用户状态确认已解锁（作为备用校验）
       const status = await getUserStatus()
       if (!status.data?.isSvip && !status.data?.unlockedQuizzes?.includes(quizId)) {
         router.push('/plaza')

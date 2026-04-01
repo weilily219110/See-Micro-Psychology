@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { QuizService } from '../services/quizService.js'
 import { deviceAuth } from '../middleware/deviceAuth.js'
+import { users } from '../services/codeService.js'
 
 export const quizRoutes = Router()
 const quizService = new QuizService()
@@ -34,10 +35,44 @@ quizRoutes.post('/unlock', deviceAuth, async (req, res, next) => {
   }
 })
 
-// GET /api/quiz/:id/content - 获取测评内容（需验签）
-quizRoutes.get('/:id/content', async (req, res, next) => {
+// GET /api/quiz/:id/token - 获取测评访问 Token
+quizRoutes.get('/:id/token', deviceAuth, async (req, res, next) => {
   try {
     const { id } = req.params
+    const deviceId = req.headers['x-device-id'] as string
+    
+    // 验证设备解锁状态（复用 getContent 的校验逻辑）
+    const user = users.get(deviceId)
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: '用户不存在',
+      })
+    }
+    
+    if (!user.isSvip && !user.unlockedQuizzes?.includes(id)) {
+      return res.status(403).json({
+        success: false,
+        error: '未解锁该测评',
+      })
+    }
+    
+    // 生成访问 token
+    const token = quizService.generateQuizToken(id)
+    res.json({
+      success: true,
+      data: { token },
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+// GET /api/quiz/:id/content - 获取测评内容（需验签+设备校验）
+quizRoutes.get('/:id/content', deviceAuth, async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const deviceId = req.headers['x-device-id'] as string
     const token = req.headers['x-quiz-token'] as string
     
     if (!token) {
@@ -47,7 +82,7 @@ quizRoutes.get('/:id/content', async (req, res, next) => {
       })
     }
     
-    const content = await quizService.getContent(id, token)
+    const content = await quizService.getContent(id, deviceId, token)
     res.json({
       success: true,
       data: content,

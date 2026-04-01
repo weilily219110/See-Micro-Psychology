@@ -152,8 +152,7 @@ export class QuizService {
     }
   }
   
-  async getContent(quizId: string, token: string) {
-    // 验证 Token
+  async getContent(quizId: string, deviceId: string, token: string) {
     const quiz = quizzes.get(quizId)
     if (!quiz) {
       const error = new Error('测评不存在')
@@ -161,11 +160,26 @@ export class QuizService {
       throw error
     }
     
-    // 生成临时访问 Token
+    // 验证 HMAC Token
     const expectedToken = this.generateQuizToken(quizId)
     if (token !== expectedToken) {
       const error = new Error('Token 无效或已过期')
       ;(error as any).status = 401
+      throw error
+    }
+    
+    // 验证设备解锁状态
+    const user = users.get(deviceId)
+    if (!user) {
+      const error = new Error('用户不存在，请先激活兑换码')
+      ;(error as any).status = 401
+      throw error
+    }
+    
+    // SVIP 或已解锁才可访问
+    if (!user.isSvip && !user.unlockedQuizzes?.includes(quizId)) {
+      const error = new Error('未解锁该测评')
+      ;(error as any).status = 403
       throw error
     }
     
