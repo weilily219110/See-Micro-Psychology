@@ -1,0 +1,13 @@
+name = "jianwei-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+JWT_SECRET = "jianwei-cloudflare-secret-change-in-production"
+
+# 兑换码配置
+ADMIN_EMAIL = "admin@jianweiixinli.com"
+ADMIN_PASSWORD_HASH = ""
+
+# CORS 配置
+ALLOWED_ORIGIN = "*"
