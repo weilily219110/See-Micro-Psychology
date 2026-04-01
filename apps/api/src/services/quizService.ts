@@ -1,6 +1,7 @@
 import * as crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 import { DeviceLogService } from './deviceLogService.js'
+import { users } from './codeService.js'
 
 // 模拟数据库
 const quizzes: Map<string, any> = new Map()
@@ -99,14 +100,33 @@ export class QuizService {
       return { unlocked: true, quizId }
     }
     
-    // 获取用户点数
-    // 实际应从数据库查询，这里简化
-    const userPoints = 10 // 模拟
-    
-    if (userPoints < quiz.priceRef) {
-      const error = new Error('点数不足')
+    // 获取用户信息
+    const user = users.get(deviceId)
+    if (!user) {
+      const error = new Error('用户不存在，请先激活兑换码')
       ;(error as any).status = 400
       throw error
+    }
+    
+    // SVIP 用户不需要扣点
+    if (!user.isSvip) {
+      if (user.points < quiz.priceRef) {
+        const error = new Error('点数不足')
+        ;(error as any).status = 400
+        throw error
+      }
+      // 扣减点数
+      user.points -= quiz.priceRef
+    }
+    
+    // 初始化已解锁列表
+    if (!user.unlockedQuizzes) {
+      user.unlockedQuizzes = []
+    }
+    
+    // 添加到已解锁列表
+    if (!user.unlockedQuizzes.includes(quizId)) {
+      user.unlockedQuizzes.push(quizId)
     }
     
     // 创建解锁记录
@@ -118,10 +138,18 @@ export class QuizService {
       completedAt: null,
     })
     
-    // 记录日志
-    await this.logService.log(deviceId, '', 'unlock', { quizId })
+    // 更新用户数据
+    users.set(deviceId, user)
     
-    return { unlocked: true, quizId }
+    // 记录日志
+    await this.logService.log(deviceId, '', 'unlock', { quizId, deductedPoints: user.isSvip ? 0 : quiz.priceRef })
+    
+    return { 
+      unlocked: true, 
+      quizId,
+      remainingPoints: user.points,
+      isSvip: user.isSvip
+    }
   }
   
   async getContent(quizId: string, token: string) {

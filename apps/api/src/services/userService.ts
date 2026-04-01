@@ -10,6 +10,7 @@ export class UserService {
         points: 0,
         isSvip: false,
         activatedAt: null,
+        unlockedQuizzes: [],
       }
     }
     
@@ -18,6 +19,7 @@ export class UserService {
       points: user.points,
       isSvip: user.isSvip,
       activatedAt: user.activatedAt,
+      unlockedQuizzes: user.unlockedQuizzes || [],
     }
   }
   
@@ -25,7 +27,6 @@ export class UserService {
     const user = users.get(deviceId)
     if (!user) return []
     
-    // 实际应从 user_quiz_record 表查询
     return user.unlockedQuizzes || []
   }
 }
